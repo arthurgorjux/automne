@@ -68,7 +68,7 @@ class CMS_grandFather
 	  * @return void
 	  * @access public
 	  */
-	public function _raiseError($errorMessage, $encodeOutput = false, $error = true) {
+	public static function _raiseError($errorMessage, $encodeOutput = false, $error = true) {
 		static $errorNumber;
 		$systemDebug = (!defined('SYSTEM_DEBUG')) ? true : SYSTEM_DEBUG;
 		if (isset($this) && isset($this->_debug) && $this->_debug === NULL) {
@@ -100,7 +100,7 @@ class CMS_grandFather
 				$outputMessage = $encodeOutput ? io::htmlspecialchars($errorMessage) : $errorMessage;
 				$view->addError(array('error' => $outputMessage, 'backtrace' => $backTraceLink));
 			}
-			
+
 			//second condition are for static calls (made by static methods)
 			if (!isset($this) || !isset($this->_log) || $this->_log) {
 				if (@file_put_contents(PATH_MAIN_FS.'/'.self::ERROR_LOG , date("Y-m-d H:i:s", time()).'|'.APPLICATION_EXEC_TYPE.'|'.$errorMessage."\n", FILE_APPEND) !== false) {
@@ -128,7 +128,7 @@ class CMS_grandFather
 		$errorMessage = $errorMessage ? sensitiveIO::getCallInfos().' : '.$errorMessage : '';
 		self::_raiseError($errorMessage, $encodeOutput, true);
 	}
-	
+
 	/**
 	  * Log a message. Same usage of raiseError but does not mark error flag on object
 	  *
@@ -255,7 +255,7 @@ class CMS_grandFather
 				'cms_oembed'						=> PATH_PACKAGES_FS.'/common/oembed.php',
 				'sensitiveio' 						=> PATH_PACKAGES_FS.'/common/sensitiveio.php',
 				'io' 								=> PATH_PACKAGES_FS.'/common/sensitiveio.php',
-				
+
 				//dialogs
 				'cms_context' 						=> PATH_PACKAGES_FS.'/dialogs/context.php', //Deprecated
 				'cms_wysiwyg_toolbar' 				=> PATH_PACKAGES_FS.'/dialogs/toolbar.php',
@@ -324,7 +324,7 @@ class CMS_grandFather
 				'cms_xmltag_xml' 					=> PATH_MODULES_FS.'/standard/tags/xml.php',
 				'cms_xmltag_js_add'					=> PATH_MODULES_FS.'/standard/tags/js-add.php',
 				'cms_xmltag_css_add'				=> PATH_MODULES_FS.'/standard/tags/css-add.php',
-				
+
 				//pageContent
 				'cms_linxescatalog' 				=> PATH_PACKAGES_FS.'/pageContent/linxescatalog.php',
 				'cms_xml2array' 					=> PATH_PACKAGES_FS.'/pageContent/xml2Array.php',
@@ -415,7 +415,7 @@ class CMS_grandFather
 				}
 				return true;
 			}
-			
+
 			//try modules Autoload
 			if (!isset($modules)) {
 				$modules = CMS_modulesCatalog::getAll("id");
@@ -445,8 +445,8 @@ class CMS_grandFather
 			/*only for stats*/
 			if (defined('STATS_DEBUG') && defined('VIEW_SQL')) {
 				if (STATS_DEBUG) CMS_stats::$filesLoaded++;
-				if (STATS_DEBUG && VIEW_SQL) { 
-					CMS_stats::$filesTable[] = array('file' => $file, 'class' => $classname, 'from' => io::getCallInfos(3)); 
+				if (STATS_DEBUG && VIEW_SQL) {
+					CMS_stats::$filesTable[] = array('file' => $file, 'class' => $classname, 'from' => io::getCallInfos(3));
 					CMS_stats::$memoryTable[] = array('file' => $file, 'class' => $classname, 'memory' => memory_get_usage(), 'peak' => memory_get_peak_usage());
 				}
 			}
