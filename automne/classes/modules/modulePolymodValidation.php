@@ -31,21 +31,21 @@ class CMS_modulePolymodValidation extends CMS_module
 	const MESSAGE_MOD_POLYMOD_VALIDATION_LOCATIONCHANGE = 4;
 	const MESSAGE_MOD_POLYMOD_VALIDATION_LOCATIONCHANGE_OFRESOURCE = 5;
 	const MESSAGE_PAGE_ACTION_PREVIZ = 811;
-	
+
 	/**
 	  * Method to get the item label
 	  * @var string
 	  * @access private
 	  */
 	protected $_resourceNameMethod 	= 'getLabel';
-	
+
 	/**
 	  * Current primary resource object definition
 	  * @var CMS_poly_object_definition
 	  * @access private
 	  */
 	protected $_primaryResourceObjectDefinition;
-	
+
 	/**
 	  * Constructor.
 	  * initializes the module object
@@ -58,7 +58,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		//Initialize object.
 		parent::__construct($codename);
 	}
-	
+
 	/**
 	  * Gets a tag representation instance
 	  *
@@ -67,7 +67,7 @@ class CMS_modulePolymodValidation extends CMS_module
 	  * @return object The module tag representation instance
 	  * @access public
 	  */
-	function getTagRepresentation($tag, $args)
+	function getTagRepresentation($tag, $args, $compatArgs = false)
 	{
 		switch ($tag->getName()) {
 			case "atm-clientspace":
@@ -81,7 +81,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			break;
 		}
 	}
-	
+
 	/**
 	  * Gets the module validations
 	  *
@@ -105,7 +105,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			if ($validations) {
 				$all_validations = array_merge($all_validations, $validations);
 			}
-			
+
 			$validations = $this->getValidationsByEditions($user, RESOURCE_EDITION_CONTENT);
 			if ($validations) {
 				$all_validations = array_merge($all_validations, $validations);
@@ -119,7 +119,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			return $all_validations;
 		}
 	}
-	
+
 	/**
 	  * Gets the module validations info
 	  *
@@ -143,7 +143,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			if ($validations) {
 				$all_validations = array_merge($all_validations, $validations);
 			}
-			
+
 			$validations = $this->getValidationsInfoByEditions($user, RESOURCE_EDITION_CONTENT);
 			if ($validations) {
 				$all_validations = array_merge($all_validations, $validations);
@@ -157,7 +157,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			return $all_validations;
 		}
 	}
-	
+
 	/**
 	  * Gets the module validations count
 	  *
@@ -181,7 +181,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		}
 		return $validations;
 	}
-	
+
 	/**
 	  * Gets the module validations for the given editions and user
 	  *
@@ -194,7 +194,7 @@ class CMS_modulePolymodValidation extends CMS_module
 	{
 		$language = $user->getLanguage();
 		$validations = array();
-		
+
 		if (CMS_poly_object_catalog::hasPrimaryResource($this->getCodename())) {
 			//get object type ID
 			$objectID = CMS_poly_object_catalog::getPrimaryResourceObjectType($this->getCodename());
@@ -210,7 +210,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			} else {
 				$where = '';
 			}
-			
+
 			$this->getPrimaryResourceDefinition();
 			//content and/or base data change
 			if ($editions & RESOURCE_EDITION_CONTENT) {
@@ -236,7 +236,7 @@ class CMS_modulePolymodValidation extends CMS_module
 						$where
 				";
 				$q = new CMS_query($sql);
-				
+
 				while ($id = $q->getValue("id")) {
 					$item = $this->getResourceByID($id);
 					$validation = new CMS_resourceValidation($this->_codename, RESOURCE_EDITION_CONTENT, $item);
@@ -293,7 +293,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		}
 		return $validations;
 	}
-	
+
 	/**
 	  * Gets the module validations Info for the given editions and user
 	  *
@@ -360,7 +360,7 @@ class CMS_modulePolymodValidation extends CMS_module
 					}
 				}
 			}
-			
+
 			if ($editions & RESOURCE_EDITION_LOCATION) {
 				//Location change
 				$sql = "
@@ -399,7 +399,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		}
 		return ($returnCount) ? $validationsCount : $validations;
 	}
-	
+
 	/**
 	  * Gets a validation for a given item
 	  *
@@ -419,7 +419,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		if (!$user->hasValidationClearance($this->_codename)) {
 			return false;
 		}
-		
+
 		if (CMS_poly_object_catalog::hasPrimaryResource($this->getCodename())) {
 			//get object type ID
 			$objectID = CMS_poly_object_catalog::getPrimaryResourceObjectType($this->getCodename());
@@ -435,7 +435,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			} else {
 				$where = '';
 			}
-			
+
 			$this->getPrimaryResourceDefinition();
 			if (!$getEditionType) {
 				$getEditionType = RESOURCE_EDITION_LOCATION + RESOURCE_EDITION_CONTENT;
@@ -476,14 +476,14 @@ class CMS_modulePolymodValidation extends CMS_module
 					}
 				}
 				//search the type of edition
-				
+
 				//RESOURCE_EDITION_LOCATION
 				if (($r["location"] == RESOURCE_LOCATION_USERSPACE
 					&&	$r["proposedFor"] != 0
 					&&	!($r["validationsRefused"] & RESOURCE_EDITION_LOCATION)) && ($getEditionType & RESOURCE_EDITION_LOCATION)) {
-					
+
 					$language = $user->getLanguage();
-					
+
 					$item = $this->getResourceByID($id);
 					$validation = new CMS_resourceValidation($this->_codename, RESOURCE_EDITION_LOCATION, $item);
 					if (!$validation->hasError()) {
@@ -499,17 +499,17 @@ class CMS_modulePolymodValidation extends CMS_module
 					} else {
 						return false;
 					}
-				
+
 				//RESOURCE_EDITION_CONTENT
 				} elseif(($r["location"] == RESOURCE_LOCATION_USERSPACE
 						&&	$r["proposedFor"] == 0
 						&&	($r["editions"] & RESOURCE_EDITION_CONTENT && !($r["validationsRefused"] & RESOURCE_EDITION_CONTENT))
 						 ) && ($getEditionType & RESOURCE_EDITION_CONTENT)) {
-					
+
 					$language = $user->getLanguage();
-					
+
 					$editions = $r["editions"];//RESOURCE_EDITION_CONTENT
-					
+
 					$item = $this->getResourceByID($id);
 					$validation = new CMS_resourceValidation($this->_codename, $editions, $item);
 					if (!$validation->hasError()) {
@@ -526,7 +526,7 @@ class CMS_modulePolymodValidation extends CMS_module
 						return false;
 					}
 				}
-				
+
 			} elseif ($q->getNumRows() == 0) {
 				return false;
 			} else {
@@ -537,7 +537,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			return false;
 		}
 	}
-	
+
 	/**
 	  * Process the module validations. Note that the EMails sent to either the transferred validator or the editors were sent before.
 	  *
@@ -559,16 +559,16 @@ class CMS_modulePolymodValidation extends CMS_module
 			$this->raiseError("ProcessValidation : result is not a valid validation option");
 			return false;
 		}
-		
+
 		//Tell the resource of the changes
 		$resource = $resourceValidation->getResource();
 		$editions = $resourceValidation->getEditions();
-		
+
 		//add a call to all modules for validation specific treatment
 		$modulesCodes = new CMS_modulesCodes();
 		//add a call to modules after validation
 		$modulesCodes->getModulesCodes(MODULE_TREATMENT_BEFORE_VALIDATION_TREATMENT, '', $resource, array('result' => $result, 'lastvalidation' => $lastValidation, 'module' => $this->_codename));
-		
+
 		switch ($result) {
 		case VALIDATION_OPTION_REFUSE:
 			//validation was refused, adjust the array of validations refused
@@ -576,7 +576,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			foreach ($all_editions as $aEdition) {
 				if ($aEdition & $editions) {
 					if (RESOURCE_EDITION_LOCATION & $aEdition && $resource->getProposedLocation() == RESOURCE_LOCATION_DELETED) {
-						$resource->removeProposedLocation(); 
+						$resource->removeProposedLocation();
 					} else {
 						$resource->addValidationRefused($aEdition);
 					}
@@ -611,7 +611,7 @@ class CMS_modulePolymodValidation extends CMS_module
 						if ($resource->getPublication() != RESOURCE_PUBLICATION_NEVERVALIDATED) {
 							$this->_changeDataLocation($resource, $locationFrom, RESOURCE_DATA_LOCATION_PUBLIC, true);
 						}
-						//move data from its location to edited 
+						//move data from its location to edited
 						$this->_changeDataLocation($resource, $locationFrom, RESOURCE_DATA_LOCATION_EDITED);
 					} else {
 						//the move entirely takes place outside of USERSPACE (archived to deleted hopefully)
@@ -636,7 +636,7 @@ class CMS_modulePolymodValidation extends CMS_module
 			} else {
 				$all_editions = CMS_resourceStatus::getAllEditions();
 				$this->_changeDataLocation($resource, RESOURCE_DATA_LOCATION_EDITED, RESOURCE_DATA_LOCATION_PUBLIC, true);
-				
+
 				foreach ($all_editions as $aEdition) {
 					if ($aEdition & $editions) {
 						$resource->validateEdition($aEdition);
@@ -653,12 +653,12 @@ class CMS_modulePolymodValidation extends CMS_module
 			//Clear polymod cache
 			//CMS_cache::clearTypeCacheByMetas('polymod', array('module' => $this->_codename));
 			CMS_cache::clearTypeCache('polymod');
-			
+
 		}
 		$modulesCodes->getModulesCodes(MODULE_TREATMENT_AFTER_VALIDATION_TREATMENT, '', $resource, array('result' => $result, 'lastvalidation' => $lastValidation, 'module' => $this->_codename));
 		return true;
 	}
-	
+
 	/**
 	  * Mark item as deleted (to be easily excluded from all searches)
 	  *
@@ -670,7 +670,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		$sql = "
 			update
 				mod_object_polyobjects
-			set 
+			set
 				deleted_moo = '1'
 			where
 				id_moo = '".sensitiveIO::sanitizeSQLString($itemID)."'
@@ -678,7 +678,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		$q = new CMS_query($sql);
 		return true;
 	}
-	
+
 	/**
 	  * Check if item is deleted
 	  *
@@ -703,7 +703,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		}
 		return $deletedItems[$itemID];
 	}
-	
+
 	/**
 	  * Changes The item data (in the DB) from one location to another.
 	  *
@@ -733,7 +733,7 @@ class CMS_modulePolymodValidation extends CMS_module
 		//then move resource data for concerned resource
 		CMS_modulePolymodValidation::moveResourceData($this->getCodename(), $resource->getID(), $locationFrom, $locationTo, $copyOnly);
 	}
-	
+
 	/**
 	  * Move the data of a resource from one data location to another.
 	  * May be used by every module, provided it respects the naming rules described in the modules HOWTO
@@ -803,7 +803,7 @@ class CMS_modulePolymodValidation extends CMS_module
 				$q = new CMS_query($sql);
 			}
 		}
-		
+
 		//second, move the files
 		$locationFromDir = new CMS_file(PATH_MODULES_FILES_FS."/".$module."/".$locationFrom, CMS_file::FILE_SYSTEM, CMS_file::TYPE_DIRECTORY);
 		//cut here if the locationFromDir doesn't exists. That means the module doesn't have files
@@ -861,8 +861,8 @@ class CMS_modulePolymodValidation extends CMS_module
 		}
 		return true;
 	}
-	
-	/** 
+
+	/**
 	  * Get the default language code for this module
 	  * Comes from parameters or Constant
 	  * Upgrades constant with parameter found
@@ -878,8 +878,8 @@ class CMS_modulePolymodValidation extends CMS_module
 		}
 		return constant("MOD_".io::strtoupper($this->getCodename())."_DEFAULT_LANGUAGE");
 	}
-	
-	/** 
+
+	/**
 	  * Get the module primary resource definition
 	  *
 	  * @return boolean true

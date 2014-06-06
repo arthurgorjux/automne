@@ -161,7 +161,7 @@ class CMS_module_standard extends CMS_module
 	  * @return object The module tag representation instance
 	  * @access public
 	  */
-	function getTagRepresentation($tag, $args)
+	function getTagRepresentation($tag, $args, $compatArg = false)
 	{
 		switch ($tag->getName()) {
 		case "atm-clientspace":
