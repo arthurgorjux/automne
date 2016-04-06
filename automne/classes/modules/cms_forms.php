@@ -46,7 +46,7 @@ class CMS_module_cms_forms extends CMS_moduleValidation
 	  * @return CMS_forms_formular
 	  * @access public
 	  */
-	function getResourceByID($ID) {
+	public static function getResourceByID($ID) {
 		return new CMS_forms_formular($ID);
 	}
 
@@ -67,7 +67,7 @@ class CMS_module_cms_forms extends CMS_moduleValidation
 			if (class_exists($class_name)) {
 				$instance = new $class_name();
 			} else {
-				$this->raiseError("Unknown block type : CMS_block_cms_forms");
+				$this->setError("Unknown block type : CMS_block_cms_forms");
 				return false;
 			}
 			$instance->initializeFromTag($tag->getAttributes(), $tag->getInnerContent());

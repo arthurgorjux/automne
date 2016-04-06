@@ -76,7 +76,7 @@ class CMS_xml2Array extends CMS_grandFather
 							xml_error_string(xml_get_error_code($parser)),
 							xml_get_current_line_number($parser));
 					if ($this->_params & ~self::XML_DONT_THROW_ERROR) {
-						$this->raiseError($this->_parsingError." :\n".$xml, true);
+						$this-->setError($this->_parsingError." :\n".$xml, true);
 					}
 				}
 				xml_parser_free($parser);
@@ -346,7 +346,7 @@ class CMS_xml2Array extends CMS_grandFather
 				}
 			}
 		} else {
-			$this->raiseError("Malformed definition to compute : ".print_r($definition, true));
+			$this-->setError("Malformed definition to compute : ".print_r($definition, true));
 			return false;
 		}
 		return false;

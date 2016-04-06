@@ -42,7 +42,7 @@ class CMS_tar_file extends CMS_archive
 	function CMS_tar_file($name)
 	{
 		if (trim($name) == '') {
-			$this->raiseError("Not a valid name given to archive ".$name);
+			$this->setError("Not a valid name given to archive ".$name);
 			return;
 		}
 		$this->CMS_archive($name);
@@ -67,7 +67,7 @@ class CMS_tar_file extends CMS_archive
 				$path = io::substr($current['name2'], 0, io::strpos($current['name2'], "/", io::strlen($current['name2']) - 100) + 1);
 				$current['name2'] = io::substr($current['name2'], io::strlen($path));
 				if (io::strlen($path) > 154 || io::strlen($current['name2']) > 99) {
-					$this->raiseError("Could not add {$path}{$current['name2']} to archive because the filename is too long.");
+					$this->setError("Could not add {$path}{$current['name2']} to archive because the filename is too long.");
 					continue;
 				}
 			}
@@ -97,7 +97,7 @@ class CMS_tar_file extends CMS_archive
 					}
 					fclose($fp);
 				} else {
-					$this->raiseError("Could not open file {$current['name']} for reading. It was not added.");
+					$this->setError("Could not open file {$current['name']} for reading. It was not added.");
 				}
 		}
 		$this->add_data(pack("a512", ""));
@@ -127,7 +127,7 @@ class CMS_tar_file extends CMS_archive
 					break;
 				} else
 					/*if ($file['magic'] != "ustar") {
-						$this->raiseError("This script does not support extracting this type of tar file.");
+						$this->setError("This script does not support extracting this type of tar file.");
 						break;
 					}*/
 				$block = substr_replace($block, "        ", 148, 8);
@@ -136,7 +136,7 @@ class CMS_tar_file extends CMS_archive
 					$checksum += ord(io::substr($block, $i, 1));
 				}
 				if ($file['checksum'] != $checksum) {
-					$this->raiseError("Could not extract from {$this->options['name']}, it is corrupt.");
+					$this->setError("Could not extract from {$this->options['name']}, it is corrupt.");
 				}
 
 				if ($this->options['inmemory'] == 1) {
@@ -163,7 +163,7 @@ class CMS_tar_file extends CMS_archive
 						}
 					} else {
 						if ($this->options['overwrite'] == 0 && file_exists($file['name'])) {
-							$this->raiseError("{$file['name']} already exists.");
+							$this->setError("{$file['name']} already exists.");
 						} else {
 							//check if destination dir exists
 							$dirname = dirname($file['name']);
@@ -184,7 +184,7 @@ class CMS_tar_file extends CMS_archive
 									chmod($file['name'], 0777);
 								}*/
 							} else {
-								$this->raiseError("Could not open {$file['name']} for writing.");
+								$this->setError("Could not open {$file['name']} for writing.");
 							}
 						}
 					}
@@ -192,7 +192,7 @@ class CMS_tar_file extends CMS_archive
 				unset ($file);
 			}
 		} else {
-			$this->raiseError("Could not open file {$this->options['name']}");
+			$this->setError("Could not open file {$this->options['name']}");
 		}
 		chdir($pwd);
 		return true;

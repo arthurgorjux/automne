@@ -178,7 +178,7 @@ class CMS_tree extends CMS_grandFather
 			return false;
 		}
 		if (strtolower(io::sanitizeAsciiString($codename)) != $codename) {
-			$this->raiseError("Page codename must be alphanumeric only");
+			$this->setError("Page codename must be alphanumeric only");
 			return false;
 		}
 		if (!isset($pagesInfos[$codename][$referencePageId])) {
@@ -912,7 +912,8 @@ class CMS_tree extends CMS_grandFather
 		";
 		$q = new CMS_query($sql);
 		// compact old siblings order
-		CMS_tree::compactSiblingOrder(CMS_tree::getPageById($father));
+		$fatherPage = CMS_tree::getPageById($father);
+		CMS_tree::compactSiblingOrder($fatherPage);
 		//get current order of siblings for old father
 		$sql = 
 			"select 
@@ -1071,7 +1072,8 @@ class CMS_tree extends CMS_grandFather
 		";
 		$q = new CMS_query($sql);
 		// compact old public siblings order
-		CMS_tree::compactSiblingOrder(CMS_tree::getPageById($oldFather), true);
+		$oldFatherPage = CMS_tree::getPageById($oldFather);
+		CMS_tree::compactSiblingOrder($oldFatherPage, true);
 		//get current order of siblings for new father
 		$sql = 
 			"select 

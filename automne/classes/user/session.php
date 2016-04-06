@@ -528,7 +528,7 @@ class CMS_session extends CMS_grandFather
 		if (io::isPositiveInteger($bookmark)) {
 			self::$_bookmark = $bookmark;
 		} else {
-			$this->raiseError("Incorrect bookmark type");
+			$this->setError("Incorrect bookmark type");
 		}
 	}
 
@@ -553,7 +553,7 @@ class CMS_session extends CMS_grandFather
 		if (SensitiveIO::isPositiveInteger($howMany)) {
 			self::$_recordsPerPage = $howMany;
 		} else {
-			$this->raiseError("Not a positive value");
+			$this->setError("Not a positive value");
 		}
 	}
 
@@ -579,7 +579,7 @@ class CMS_session extends CMS_grandFather
 			$sessionNS = new Zend_Session_Namespace('atm-page');
 			$sessionNS->pageId = $page->getID();
 		} else {
-			$this->raiseError("Incorrect Page type");
+			$this->setError("Incorrect Page type");
 		}
 	}
 

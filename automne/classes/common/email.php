@@ -287,7 +287,7 @@ class CMS_email extends CMS_grandFather
 			$this->_template = $template;
 			return true;
 		} else {
-			$this->raiseError('Cannot get template file : '.$template);
+			$this->setError('Cannot get template file : '.$template);
 			return false;
 		}
 	}
@@ -313,13 +313,13 @@ class CMS_email extends CMS_grandFather
 	{
 		if (!is_array($emailTo)) {
 			if (!sensitiveIO::isValidEmail($emailTo)) {
-				//$this->raiseError('Invalid emailTo : '.$emailTo);
+				//$this->setError('Invalid emailTo : '.$emailTo);
 				return false;
 			}
 		} else {
 			foreach ($emailTo as $email) {
 				if (!sensitiveIO::isValidEmail($email)) {
-					$this->raiseError('Invalid emailTo : '.$email);
+					$this->setError('Invalid emailTo : '.$email);
 					return false;
 				}
 			}
@@ -339,13 +339,13 @@ class CMS_email extends CMS_grandFather
 	{
 		if (!is_array($emailCc)) {
 			if (!sensitiveIO::isValidEmail($emailCc)) {
-				//$this->raiseError('Invalid emailTo : '.$emailTo);
+				//$this->setError('Invalid emailTo : '.$emailTo);
 				return false;
 			}
 		} else {
 			foreach ($emailCc as $email) {
 				if (!sensitiveIO::isValidEmail($email)) {
-					$this->raiseError('Invalid emailTo : '.$email);
+					$this->setError('Invalid emailTo : '.$email);
 					return false;
 				}
 			}
@@ -365,13 +365,13 @@ class CMS_email extends CMS_grandFather
 	{
 		if (!is_array($emailBcc)) {
 			if (!sensitiveIO::isValidEmail($emailBcc)) {
-				//$this->raiseError('Invalid emailTo : '.$emailTo);
+				//$this->setError('Invalid emailTo : '.$emailTo);
 				return false;
 			}
 		} else {
 			foreach ($emailBcc as $email) {
 				if (!sensitiveIO::isValidEmail($email)) {
-					$this->raiseError('Invalid emailTo : '.$email);
+					$this->setError('Invalid emailTo : '.$email);
 					return false;
 				}
 			}
@@ -529,12 +529,12 @@ class CMS_email extends CMS_grandFather
 	  */
 	function sendEmail(){
 		if ($this->hasError()) {
-			$this->raiseError('Cannot send email, error appened');
+			$this->setError('Cannot send email, error appened');
 			return false;
 		}
 		$emailSent = true;
 		if (!$this->_emailTo) {
-			$this->raiseError('emailTo can not be null');
+			$this->setError('emailTo can not be null');
 			return false;
 		}
 		
@@ -674,7 +674,7 @@ class CMS_email extends CMS_grandFather
 						$log = new CMS_log();
 						$log->logMiscAction(CMS_log::LOG_ACTION_SEND_EMAIL, $user, 'Email To '.$to.', From : '.$From.', Subject : '.$Subject.', Sent : No, Dropped because sender or receiver address is under Automne drop address list');
 					} else {
-						$this->raiseError('Email to '.$to.', from : '.$From.' (subject : '.$Subject.'), Dropped because sender or receiver address is under Automne drop address list');
+						$this->setError('Email to '.$to.', from : '.$From.' (subject : '.$Subject.'), Dropped because sender or receiver address is under Automne drop address list');
 					}
 				}
 			} else {
@@ -682,12 +682,12 @@ class CMS_email extends CMS_grandFather
 					$log = new CMS_log();
 					$log->logMiscAction(CMS_log::LOG_ACTION_SEND_EMAIL, $user, 'Email To '.$to.', From : '.$From.', Subject : '.$Subject.', Sent : No, Dropped because receiver address is not valid');
 				} else {
-					$this->raiseError('Email to '.$to.', from : '.$From.' (subject : '.$Subject.'), Dropped because receiver address is not valid');
+					$this->setError('Email to '.$to.', from : '.$From.' (subject : '.$Subject.'), Dropped because receiver address is not valid');
 				}
 			}
 		}
 		if (!$emailSent) {
-			$this->raiseError('Email was not sent, please check your sendmail configuration or SMTP connection in php.ini');
+			$this->setError('Email was not sent, please check your sendmail configuration or SMTP connection in php.ini');
 		}
 		return $emailSent;
 	}

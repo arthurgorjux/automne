@@ -105,14 +105,14 @@ class CMS_file extends CMS_grandFather
 				$this->_name = $name;
 				$this->_type = self::TYPE_FILE;
 				$this->_exists = true;
-				$this->_perms = $this->getFilePerms($this->_name);
+				$this->_perms = CMS_file::getFilePerms($this->_name);
 				$this->_basedir = dirname($this->_name);
 				$this->_filename = basename($this->_name);
 			} elseif (@is_dir($name) && $type == self::TYPE_DIRECTORY) {
 				$this->_name = $name;
 				$this->_type = self::TYPE_DIRECTORY;
 				$this->_exists = true;
-				$this->_perms = $this->getFilePerms($this->_name);
+				$this->_perms = CMS_file::getFilePerms($this->_name);
 				$this->_basedir = $name;
 				$this->_filename = "";
 			} else {
@@ -154,10 +154,10 @@ class CMS_file extends CMS_grandFather
 					$this->_content=$content;
 					return true;
 				} elseif($this->_type==self::TYPE_DIRECTORY) {
-					$this->raiseError("Current object is a directory. Can't set content");
+					$this->setError("Current object is a directory. Can't set content");
 					return false;
 				} else {
-					$this->raiseError("Current object type not set. Can't set content");
+					$this->setError("Current object type not set. Can't set content");
 					return false;
 				}
 			} elseif (is_array($content)) {
@@ -165,18 +165,18 @@ class CMS_file extends CMS_grandFather
 					$this->_content=implode("\n",$content);
 					return true;
 				} elseif($this->_type==self::TYPE_DIRECTORY) {
-					$this->raiseError("Current object is a directory. Can't set content");
+					$this->setError("Current object is a directory. Can't set content");
 					return false;
 				} else {
-					$this->raiseError("Current object type not set. Can't set content");
+					$this->setError("Current object type not set. Can't set content");
 					return false;
 				}
 			} else {
-				$this->raiseError("Only can set string and array content");
+				$this->setError("Only can set string and array content");
 				return false;
 			}
 		} else {
-			$this->raiseError("Try to set blank content");
+			$this->setError("Try to set blank content");
 			return false;
 		}
 	}
@@ -344,7 +344,7 @@ class CMS_file extends CMS_grandFather
 								}
 								//check for number of values in current line (tolerance is one because last CSV value can be empty so PHP array is smaller)
 								elseif (sizeof($data) != $num && (sizeof($data)+1) != $num && (sizeof($data)-1) != $num) {
-									$this->raiseError("Invalid CSV content file : column count does not match : ".sizeof($data)." should be ".$num." at line ".($count+1));
+									$this->setError("Invalid CSV content file : column count does not match : ".sizeof($data)." should be ".$num." at line ".($count+1));
 									return false;
 								}
 							}
@@ -354,7 +354,7 @@ class CMS_file extends CMS_grandFather
 					}
 					return $array;
 				} else {
-					$this->raiseError("Invalid method for reading content : ".$returnAs);
+					$this->setError("Invalid method for reading content : ".$returnAs);
 					return false;
 				}
 			} elseif ($this->_type===self::TYPE_DIRECTORY) {
@@ -367,11 +367,11 @@ class CMS_file extends CMS_grandFather
 				}
 				return $array;
 			} else {
-				$this->raiseError("Current object is a directory. Can't read content");
+				$this->setError("Current object is a directory. Can't read content");
 				return false;
 			}
 		} else {
-			$this->raiseError("File ".$this->_name." does not exist. Please write to persistence first");
+			$this->setError("File ".$this->_name." does not exist. Please write to persistence first");
 			return false;
 		}
 	}
@@ -387,12 +387,12 @@ class CMS_file extends CMS_grandFather
 	function writeToPersistence($allowWriteBlank = false, $createFolder = false)  {
 		if ($this->_type==self::TYPE_FILE) {
 			if (!$allowWriteBlank && !$this->_content) {
-				$this->raiseError("Try to write an empty file");
+				$this->setError("Try to write an empty file");
 				return false;
 			}
 			if ($this->exists()) {
-				if (!$this->makeWritable($this->_name)) {
-					$this->raiseError("Can't write file ".$this->_name);
+				if (!CMS_file::makeWritable($this->_name)) {
+					$this->setError("Can't write file ".$this->_name);
 					return false;
 				}
 			}
@@ -400,16 +400,16 @@ class CMS_file extends CMS_grandFather
 			if (!$f = @fopen($this->_name,'wb')) {
 				if ($createFolder && CMS_file::makeDir($this->_basedir)) {
 					if (!$f = @fopen($this->_name,'wb')) {
-						$this->raiseError("Can't open file for writing and can't create directory for: ".$this->_name);
+						$this->setError("Can't open file for writing and can't create directory for: ".$this->_name);
 						return false;
 					}
 				} else {
-					$this->raiseError("Can't open file for writing file: ".$this->_name);
+					$this->setError("Can't open file for writing file: ".$this->_name);
 					return false;
 				}
 			}
 			if (@fwrite($f, $this->_content) === false) {
-				$this->raiseError("Can't write file ".$this->_name);
+				$this->setError("Can't write file ".$this->_name);
 				return false;
 			} else {
 				$this->_exists=true;
@@ -419,7 +419,7 @@ class CMS_file extends CMS_grandFather
 			return true;
 		} else {
 			if (!CMS_file::makeDir($this->_name)) {
-				$this->raiseError("Can't write directory ".$this->_name);
+				$this->setError("Can't write directory ".$this->_name);
 				return false;
 			} else {
 				$this->_exists=true;
@@ -461,7 +461,7 @@ class CMS_file extends CMS_grandFather
 			$right = (io::strlen($right) == 3) ? '0'.$right : $right;
 			return @chmod($this->_name,octdec($right));
 		} else {
-			$this->raiseError("Can't chmod file who does not exist : ".$this->_name);
+			$this->setError("Can't chmod file who does not exist : ".$this->_name);
 			return false;
 		}
 	}
@@ -473,7 +473,7 @@ class CMS_file extends CMS_grandFather
 	 * @param string $destinationDirFS, the destination dir in which we want the file to be moved
 	 * @return array of uploaded file meta datas
 	 */
-	function uploadFile($fileVarName = 'Filedata', $destinationDirFS = PATH_UPLOAD_FS) {
+	public static function uploadFile($fileVarName = 'Filedata', $destinationDirFS = PATH_UPLOAD_FS) {
 		//for security, clean all files older than 4h in both uploads directories
 		$yesterday = time() - 14400; //4h
 		try{
@@ -505,6 +505,7 @@ class CMS_file extends CMS_grandFather
 		if (!isset($_FILES[$fileVarName]) || !is_uploaded_file($_FILES[$fileVarName]["tmp_name"]) || $_FILES[$fileVarName]["error"] != 0) {
 			CMS_grandFather::raiseError('Uploaded file has an error : '.print_r($_FILES, true));
 			$fileDatas['error'] = CMS_file::UPLOAD_UPLOAD_FAILED;
+			$view = CMS_view::getInstance();
 			$view->setContent($fileDatas);
 			$view->show();
 		}
@@ -629,11 +630,10 @@ class CMS_file extends CMS_grandFather
 	  * @param mixed $forceContentType : false to auto get the mime type to send, or string to force a mime type
 	  * @return void or false if error
 	  * @access public
-	  * @static
 	  */
 	function download($inline = true, $deleteFile = false, $forceContentType = false) {
 		if (!$this->exists()) {
-			$this->raiseError("Can't donwload file which does not exist");
+			$this->setError("Can't donwload file which does not exist");
 			return false;
 		}
 		return CMS_file::downloadFile($this->_name, $inline, $deleteFile, $forceContentType);
@@ -651,7 +651,7 @@ class CMS_file extends CMS_grandFather
 	 * @return octal value of the file
 	 * @static
 	 */
-	function getFilePerms($file, $type="octal")
+	public static function getFilePerms($file, $type="octal")
 	{
 		$file = realpath($file);
 		if (!file_exists($file)) {
@@ -667,7 +667,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function isDeletable($f)
+	public static function isDeletable($f)
 	{
 		$f = realpath($f);
 		if (is_file($f)) {
@@ -685,7 +685,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function deleteFile($file) {
+	public static function deleteFile($file) {
 		$file = realpath($file);
 		if (is_file($file)) {
 			return @unlink($file);
@@ -741,7 +741,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function deltreeSimulation($dir, $withDir=false) {
+	public static function deltreeSimulation($dir, $withDir=false) {
 		$dir = realpath($dir);
 		if (!is_dir($dir)) {
 			return false;
@@ -762,7 +762,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function makeReadable($f)
+	public static function makeReadable($f)
 	{
 		$f = realpath($f);
 		if (!file_exists($f)) {
@@ -802,7 +802,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function makeWritable($f)
+	public static function makeWritable($f)
 	{
 		$f = realpath($f);
 		if (!file_exists($f)) {
@@ -841,7 +841,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function makeExecutable($f)
+	public static function makeExecutable($f)
 	{
 		$f = realpath($f);
 		if (!file_exists($f)) {
@@ -879,7 +879,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function fileIsExecutable($f) {
+	static function fileIsExecutable($f) {
 		$f = realpath($f);
 		if (!file_exists($f)) {
 			return false;
@@ -929,7 +929,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function makeDir($f)
+	public static function makeDir($f)
 	{
 		//create directories recursively
 		if (!@is_dir(dirname($f))) {
@@ -952,7 +952,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function copyTo($from,$to)
+	public static function copyTo($from,$to)
 	{
 		$from = realpath($from);
 		if (@is_file($from)) {
@@ -978,7 +978,7 @@ class CMS_file extends CMS_grandFather
 	 * @return boolean true on success, false on failure
 	 * @static
 	 */
-	function moveTo($from,$to)
+	public static function moveTo($from,$to)
 	{
 		$from = realpath($from);
 		if (@is_file($from)) {
@@ -1003,7 +1003,7 @@ class CMS_file extends CMS_grandFather
 	 * @return array (view CMS_archive::list_files to complete description)
 	 * @static
 	 */
-	function getFileList ($file)
+	public static function getFileList ($file)
 	{
 		$return=array();
 		if (strstr($file, "*")) {
@@ -1033,7 +1033,7 @@ class CMS_file extends CMS_grandFather
 	 * @return string : the parent dir filename
 	 * @static
 	 */
-	function getParent($file) {
+	public static function getParent($file) {
 		if (@file_exists(dirname(realpath($file)))) {
 			return dirname($file);
 		} else {
@@ -1048,7 +1048,7 @@ class CMS_file extends CMS_grandFather
 	  * @access public
 	  * @static
 	 */
-	function getTmpPath() {
+	public static function getTmpPath() {
 		$tmpPath = '';
 		if(PATH_PHP_TMP && @is_dir(PATH_PHP_TMP) && is_object(@dir(PATH_PHP_TMP)) && is_writable(PATH_PHP_TMP)) {
 			$tmpPath = PATH_PHP_TMP;
@@ -1075,12 +1075,7 @@ class CMS_file extends CMS_grandFather
 	  * @access public
 	  * @static
 	  */
-	function mimeContentType($file='') {
-		if (!$file && isset($this)) {
-			if ($this->exists() && $this->_type === self::TYPE_FILE) {
-				$file = $this->_name;
-			}
-		}
+	public static function mimeContentType($file='') {
 		if (!$file) {
 			return false;
 		}
@@ -1111,7 +1106,7 @@ class CMS_file extends CMS_grandFather
 	  * @access public
 	  * @static
 	  */
-	function getMaxUploadFileSize($unit = 'M') {
+	public static function getMaxUploadFileSize($unit = 'M') {
 		$max = (int) ((int) ini_get("upload_max_filesize") < (int) ini_get("post_max_size")) ? ini_get("upload_max_filesize") : ini_get("post_max_size");
 		if ($unit == 'M') {
 			return io::substr($max, 0, -1);
@@ -1258,7 +1253,7 @@ class CMS_file extends CMS_grandFather
 	  * @access public
 	  * @static
 	  */
-	function gzipfile ($source, $dest, $level = 6) {
+	public static function gzipfile ($source, $dest, $level = 6) {
 		if (!file_exists($source)) {
 			CMS_grandFather::raiseError('Source file to gzip does not exists : '.$source);
 			return false;
@@ -1291,7 +1286,7 @@ class CMS_file extends CMS_grandFather
 	  * @access public
 	  * @static
 	  */
-	function downloadFile($source, $inline = true, $deleteFile = false, $forceContentType = false) {
+	static function downloadFile($source, $inline = true, $deleteFile = false, $forceContentType = false) {
 		if (!file_exists($source)) {
 			CMS_grandFather::raiseError('Source file to send does not exists : '.$source);
 			return false;

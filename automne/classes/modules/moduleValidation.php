@@ -97,7 +97,7 @@ class CMS_moduleValidation extends CMS_module
 	function getValidations($user)
 	{
 		if (!is_a($user, "CMS_profile_user")) {
-			$this->raiseError("User is not a valid CMS_profile_user object");
+			$this->setError("User is not a valid CMS_profile_user object");
 			return false;
 		}
 		if (!$user->hasValidationClearance($this->_codename)) {
@@ -134,7 +134,7 @@ class CMS_moduleValidation extends CMS_module
 	function getValidationsInfo($user)
 	{
 		if (!is_a($user, "CMS_profile_user")) {
-			$this->raiseError("User is not a valid CMS_profile_user object");
+			$this->setError("User is not a valid CMS_profile_user object");
 			return false;
 		}
 		if (!$user->hasValidationClearance($this->_codename)) {
@@ -171,7 +171,7 @@ class CMS_moduleValidation extends CMS_module
 	function getValidationsCount($user)
 	{
 		if (!is_a($user, "CMS_profile_user")) {
-			$this->raiseError("User is not a valid CMS_profile_user object");
+			$this->setError("User is not a valid CMS_profile_user object");
 			return false;
 		}
 		if (!$user->hasValidationClearance($this->_codename)) {
@@ -220,7 +220,7 @@ class CMS_moduleValidation extends CMS_module
 				$q = new CMS_query($sql);
 
 				while ($id = $q->getValue("id")) {
-					$item = $this->getResourceByID($id);
+					$item = CMS_module::getResourceByID($id);
 					$validation = new CMS_resourceValidation($this->_codename, RESOURCE_EDITION_CONTENT, $item);
 					if (!$validation->hasError()) {
 						$validation->setValidationTypeLabel($language->getMessage($this->getModuleValidationLabel("edition"), false, $this->_codename));
@@ -253,7 +253,7 @@ class CMS_moduleValidation extends CMS_module
 				";
 				$q = new CMS_query($sql);
 				while ($id = $q->getValue("id")) {
-					$item = $this->getResourceByID($id);
+					$item = CMS_module::getResourceByID($id);
 					$validation = new CMS_resourceValidation($this->_codename, RESOURCE_EDITION_LOCATION, $item);
 					if (!$validation->hasError()) {
 						$validation->setValidationTypeLabel($language->getMessage($this->getModuleValidationLabel("locationChange"), false, $this->_codename));
@@ -365,7 +365,7 @@ class CMS_moduleValidation extends CMS_module
 	function getValidationByID($itemID, &$user, $getEditionType=false)
 	{
 		if (!is_a($user, "CMS_profile_user")) {
-			$this->raiseError("User is not a valid CMS_profile_user object");
+			$this->setError("User is not a valid CMS_profile_user object");
 			return false;
 		}
 		if (!$user->hasValidationClearance($this->_codename)) {
@@ -409,7 +409,7 @@ class CMS_moduleValidation extends CMS_module
 
 					$language = $user->getLanguage();
 
-					$item = $this->getResourceByID($id);
+					$item = CMS_module::getResourceByID($id);
 					$validation = new CMS_resourceValidation($this->_codename, RESOURCE_EDITION_LOCATION, $item);
 					if (!$validation->hasError()) {
 						$validation->setValidationTypeLabel($language->getMessage($this->getModuleValidationLabel("locationChange"), false, $this->_codename));
@@ -435,7 +435,7 @@ class CMS_moduleValidation extends CMS_module
 
 					$editions = $r["editions"];//RESOURCE_EDITION_CONTENT
 
-					$item = $this->getResourceByID($id);
+					$item = CMS_module::getResourceByID($id);
 					$validation = new CMS_resourceValidation($this->_codename, $editions, $item);
 					if (!$validation->hasError()) {
 						$validation->setValidationTypeLabel($language->getMessage($this->getModuleValidationLabel("edition"), false, $this->_codename));
@@ -455,7 +455,7 @@ class CMS_moduleValidation extends CMS_module
 			} elseif ($q->getNumRows() ==0) {
 				return false;
 			} else {
-				$this->raiseError("Can't have more than one item for a given ID");
+				$this->setError("Can't have more than one item for a given ID");
 				return false;
 			}
 		} else {
@@ -474,7 +474,7 @@ class CMS_moduleValidation extends CMS_module
 	function processValidation($resourceValidation, $result, $lastValidation = true)
 	{
 		if (!is_a($resourceValidation, "CMS_resourceValidation")) {
-			$this->raiseError("ResourceValidation is not a valid CMS_resourceValidation object");
+			$this->setError("ResourceValidation is not a valid CMS_resourceValidation object");
 			return false;
 		}
 		if (is_array($this->_resourceInfo) && $this->_resourceInfo) {
@@ -496,7 +496,7 @@ class CMS_moduleValidation extends CMS_module
 	  * @return void
 	  * @access private
 	  */
-	protected function _changeDataLocation($resource, $locationFrom, $locationTo, $copyOnly = false)
+	protected static function _changeDataLocation($resource, $locationFrom, $locationTo, $copyOnly = false)
 	{
 		if (is_array($this->_resourceInfo) && $this->_resourceInfo) {
 			if (!parent::_changeDataLocation($resource, $locationFrom, $locationTo, $copyOnly)) {
@@ -529,7 +529,7 @@ class CMS_moduleValidation extends CMS_module
 		if ($labels[$label]) {
 			return $labels[$label];
 		} else {
-			$this->raiseError("Unknown label or constant not set : ".$label);
+			$this->setError("Unknown label or constant not set : ".$label);
 			return false;
 		}
 	}

@@ -75,7 +75,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 		$datas = array();
 		if ($id && !$dbValues) {
 			if (!SensitiveIO::isPositiveInteger($id)) {
-				$this->raiseError("Id is not a positive integer : ".$id);
+				$this->setError("Id is not a positive integer : ".$id);
 				return;
 			}
 			$sql = "
@@ -92,7 +92,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 			if ($q->getNumRows()) {
 				$datas = $q->getArray();
 			} else {
-				$this->raiseError("Unknown ID :".$id);
+				$this->setError("Unknown ID :".$id);
 				return;
 			}
 		} elseif (is_array($dbValues) && $dbValues) {
@@ -150,11 +150,11 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 	  */
 	function setValue($valueName, $value) {
 		if (!isset($this->_objectFieldValues[$valueName])) {
-			$this->raiseError("Unknown valueName to set :".$valueName);
+			$this->setError("Unknown valueName to set :".$valueName);
 			return false;
 		}
 		if ($valueName == 'uuid') {
-			$this->raiseError("Cannot change UUID");
+			$this->setError("Cannot change UUID");
 			return false;
 		}
 		$this->_objectFieldValues[$valueName] = $value;
@@ -170,7 +170,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 	  */
 	function getValue($valueName) {
 		if (!isset($this->_objectFieldValues[$valueName])) {
-			$this->raiseError("Unknown valueName to get : ".$valueName);
+			$this->setError("Unknown valueName to get : ".$valueName);
 			return false;
 		}
 		return $this->_objectFieldValues[$valueName];
@@ -306,7 +306,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 		}
 		$q = new CMS_query($sql);
 		if ($q->hasError()) {
-			$this->raiseError("Can't save object");
+			$this->setError("Can't save object");
 			return false;
 		} elseif (!$this->_fieldID) {
 			$this->_fieldID = $q->getLastInsertedID();
@@ -338,7 +338,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 				//then delete them
 				foreach($filesList as $aFile) {
 					if (!CMS_file::deleteFile($aFile['name'])) {
-						$this->raiseError("Can't delete file ".$aFile['name']." for field : ".$this->_fieldID);
+						$this->setError("Can't delete file ".$aFile['name']." for field : ".$this->_fieldID);
 						return false;
 					}
 				}
@@ -368,7 +368,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 				";
 				$q = new CMS_query($sql);
 				if ($q->hasError()) {
-					$this->raiseError("Can't delete datas of table ".$aTable." for field : ".$this->_fieldID);
+					$this->setError("Can't delete datas of table ".$aTable." for field : ".$this->_fieldID);
 					return false;
 				}
 			}
@@ -387,7 +387,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 			";
 			$q = new CMS_query($sql);
 			if ($q->hasError()) {
-				$this->raiseError("Can't delete datas of table mod_object_field for field : ".$this->_fieldID);
+				$this->setError("Can't delete datas of table mod_object_field for field : ".$this->_fieldID);
 				return false;
 			}
 			

@@ -71,12 +71,12 @@ class CMS_grandFather
 	public static function _raiseError($errorMessage, $encodeOutput = false, $error = true) {
 		static $errorNumber;
 		$systemDebug = (!defined('SYSTEM_DEBUG')) ? true : SYSTEM_DEBUG;
-		if (isset($this) && isset($this->_debug) && $this->_debug === NULL) {
+		/*if (isset($this) && isset($this->_debug) && $this->_debug === NULL) {
 			$this->_debug = $systemDebug;
-		}
+		}*/
 		if ($errorMessage) {
 			//second condition are for static calls (made by static methods)
-			if (!defined('APPLICATION_EXEC_TYPE') || (APPLICATION_EXEC_TYPE == 'http' && ((!isset($this) && $systemDebug) || (isset($this) && isset($this->_debug) && $this->_debug)))) {
+			if (!defined('APPLICATION_EXEC_TYPE') || (APPLICATION_EXEC_TYPE == 'http' && ($systemDebug))) {
 				$backTrace = $backTraceLink = '';
 				if (version_compare(phpversion(), "5.2.5", "<")) {
 					$bt = @array_reverse(debug_backtrace());
@@ -102,19 +102,75 @@ class CMS_grandFather
 			}
 
 			//second condition are for static calls (made by static methods)
-			if (!isset($this) || !isset($this->_log) || $this->_log) {
+			/*if (!isset($this) || !isset($this->_log) || $this->_log) {*/
 				if (@file_put_contents(PATH_MAIN_FS.'/'.self::ERROR_LOG , date("Y-m-d H:i:s", time()).'|'.APPLICATION_EXEC_TYPE.'|'.$errorMessage."\n", FILE_APPEND) !== false) {
 					CMS_file::chmodFile(FILES_CHMOD, PATH_MAIN_FS.'/'.self::ERROR_LOG);
 				} else {
 					die('<pre><b>'.CMS_view::SYSTEM_LABEL.' '.AUTOMNE_VERSION.' error : /automne dir is not writable'."</b></pre>\n");
 				}
-			}
+			/*}*/
 		}
-		//must be at the end because it interferes with the static calls conditions above
+		/*//must be at the end because it interferes with the static calls conditions above
 		if ($error && isset($this)) {
 			$this->_errRaised = true;
+		}*/
+	}
+
+	/**
+	  * Raises an error. Shows it to the screen
+	  * Deprecated, use raiseError instead
+	  * @param string $errorMessage the error message.
+	  * @param boolean $encodeOutput, does the screen output should be encoded (default : false)
+	  * @return void
+	  * @access public
+	  * Use for non-static calls of _raiseError
+	  */
+	public function _setError($errorMessage, $encodeOutput = false, $error = true) {
+	$systemDebug = (!defined('SYSTEM_DEBUG')) ? true : SYSTEM_DEBUG;
+	if($this->_debug === NULL) {
+		$this->_debug = $systemDebug;
+	}
+	if ($errorMessage) {
+		//second condition are for static calls (made by static methods)
+		if (!defined('APPLICATION_EXEC_TYPE') || (APPLICATION_EXEC_TYPE == 'http' && (isset($this->_debug) && $this->_debug))) {
+			$backTrace = $backTraceLink = '';
+			if (version_compare(phpversion(), "5.2.5", "<")) {
+				$bt = @array_reverse(debug_backtrace());
+			} else {
+				$bt = @array_reverse(debug_backtrace(false));
+			}
+			$backtrace = array(
+				'summary'		=> sensitiveIO::printBackTrace($bt),
+				'backtrace'		=> @print_r($bt,true),
+			);
+			$backtraceName = 'bt_'.md5(rand());
+			$backTraceLink = PATH_ADMIN_WR.'/backtrace.php?bt='.$backtraceName;
+			//save backtrace to cache (for 10 min)
+			$cache = new CMS_cache($backtraceName, 'atm-backtrace', 600, false);
+			if ($cache) {
+				$cache->save($backtrace);
+			}
+			unset($backtrace, $cache, $bt);
+			//append error to current view
+			$view = CMS_view::getInstance();
+			$outputMessage = $encodeOutput ? io::htmlspecialchars($errorMessage) : $errorMessage;
+			$view->addError(array('error' => $outputMessage, 'backtrace' => $backTraceLink));
+		}
+
+		//second condition are for static calls (made by static methods)
+		if ($this->_log) {
+			if (@file_put_contents(PATH_MAIN_FS.'/'.self::ERROR_LOG , date("Y-m-d H:i:s", time()).'|'.APPLICATION_EXEC_TYPE.'|'.$errorMessage."\n", FILE_APPEND) !== false) {
+				CMS_file::chmodFile(FILES_CHMOD, PATH_MAIN_FS.'/'.self::ERROR_LOG);
+			} else {
+				die('<pre><b>'.CMS_view::SYSTEM_LABEL.' '.AUTOMNE_VERSION.' error : /automne dir is not writable'."</b></pre>\n");
+			}
 		}
 	}
+	//must be at the end because it interferes with the static calls conditions above
+	if ($error) {
+		$this->_errRaised = true;
+	}
+}
 
 	/**
 	  * Raises an error.
@@ -124,10 +180,25 @@ class CMS_grandFather
 	  * @return void
 	  * @access public
 	  */
-	public function raiseError($errorMessage = '', $encodeOutput = false) {
+	public static function raiseError($errorMessage = '', $encodeOutput = false) {
 		$errorMessage = $errorMessage ? sensitiveIO::getCallInfos().' : '.$errorMessage : '';
 		self::_raiseError($errorMessage, $encodeOutput, true);
 	}
+
+	/**
+	  * Raises an error.
+	  *
+	  * @param string $errorMessage the error message.
+	  * @param boolean $encodeOutput, does the screen output should be encoded (default : false)
+	  * @return void
+	  * @access public
+	  * Use for non-static calls of raiseError
+	  */
+	public function setError($errorMessage = '', $encodeOutput = false) {
+		$errorMessage = $errorMessage ? sensitiveIO::getCallInfos().' : '.$errorMessage : '';
+		$this->_setError($errorMessage, $encodeOutput, true);
+	}
+
 
 	/**
 	  * Log a message. Same usage of raiseError but does not mark error flag on object
@@ -137,9 +208,9 @@ class CMS_grandFather
 	  * @return void
 	  * @access public
 	  */
-	public function log($errorMessage, $encodeOutput = false) {
+	public static function log($errorMessage, $encodeOutput = false) {
 		$errorMessage = sensitiveIO::getCallInfos().' : '.(!is_scalar($errorMessage) ? print_r($errorMessage, true) : $errorMessage);
-		self::_raiseError($errorMessage, $encodeOutput, false);
+		self::raiseError($errorMessage, $encodeOutput, false);
 	}
 
 	/**
@@ -204,7 +275,7 @@ class CMS_grandFather
 							16384				=> 'User deprecated', //E_USER_DEPRECATED - numeric value because only supported from PHP 5.3
 						);
 		$errorLabel = isset($errortype[$errno]) ? $errortype[$errno] : 'Error '.$errno;
-		CMS_grandFather::_raiseError('PHP '.$errorLabel.' : '.$errstr.' line '.$errline.' of file '.$errfile);
+		CMS_grandFather::raiseError('PHP '.$errorLabel.' : '.$errstr.' line '.$errline.' of file '.$errfile);
 		return true;
 	}
 
@@ -218,9 +289,9 @@ class CMS_grandFather
 	{
 		$bt = debug_backtrace();
 		if (isset($bt[1]) && isset($bt[1]['class'])) {
-			$this->raiseError('Unknown method \''.$name.'\' for object '.$bt[1]['class'].' in this version of Automne');
+			$this->setError('Unknown method \''.$name.'\' for object '.$bt[1]['class'].' in this version of Automne');
 		} else{
-			$this->raiseError('Unknown method \''.$name.'\' in this version of Automne');
+			$this->setError('Unknown method \''.$name.'\' in this version of Automne');
 		}
 		return false;
 	}

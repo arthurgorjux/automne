@@ -66,7 +66,7 @@ class CMS_polymod extends CMS_modulePolymodValidation
 	  * @return CMS_resource The CMS_resource subclassed object
 	  * @access public
 	  */
-	function getResourceByID($resourceID)
+	public static function getResourceByID($resourceID)
 	{
 		//parent::getResourceByID($resourceID);
 		return CMS_poly_object_catalog::getObjectByID($resourceID);
@@ -163,7 +163,7 @@ class CMS_polymod extends CMS_modulePolymodValidation
 			break;
 			case MODULE_TREATMENT_PAGECONTENT_TAGS :
 				if (!($treatedObject instanceof CMS_page)) {
-					$this->raiseError('$treatedObject must be a CMS_page object');
+					$this->setError('$treatedObject must be a CMS_page object');
 					return false;
 				}
 				switch ($tag->getName()) {
@@ -506,7 +506,7 @@ class CMS_polymod extends CMS_modulePolymodValidation
 			if (class_exists($class_name)) {
 				$instance = new $class_name();
 			} else {
-				$this->raiseError("Unknown block type : CMS_block_polymod");
+				$this->setError("Unknown block type : CMS_block_polymod");
 				return false;
 			}
 			//pr(io::htmlspecialchars($tag->getInnerContent()));
@@ -661,7 +661,7 @@ class CMS_polymod extends CMS_modulePolymodValidation
 	  * @return string : the file to use for required classname
 	  * @access public
 	  */
-	function load($classname) {
+	static function load($classname) {
 		static $classes;
 		if (!isset($classes)) {
 			$classes = array(
@@ -963,7 +963,7 @@ class CMS_polymod extends CMS_modulePolymodValidation
 	  * @return void
 	  * @access public
 	  */
-	function compileDefinitions() {
+	public static function compileDefinitions() {
 		//foreach definition, plugin and rss, recompile stored values if exists
 		$modules = CMS_modulesCatalog::getAll("id", true);
 		$hasPolyModule = false;

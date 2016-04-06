@@ -39,7 +39,8 @@ class CMS_polymod_oembed_definition_catalog extends CMS_grandFather
 		$sql = 'SELECT * from mod_object_oembed_definition where codename_mood = "'.io::sanitizeSQLString($codename).'"';
 		$query = new CMS_query($sql);
 
-		$data = array_pop($query->getAll());
+		$result = $query->getAll();
+		$data = array_pop($result);
 		if($data === null) {
 			return null;
 		}

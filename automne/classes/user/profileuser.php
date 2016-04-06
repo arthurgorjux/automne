@@ -147,7 +147,7 @@ class CMS_profile_user extends CMS_profile
 		$this->_alerts = new CMS_stack();
 		if ($id) {
 			if (!SensitiveIO::isPositiveInteger($id)) {
-				$this->raiseError("Id is not a positive integer");
+				$this->setError("Id is not a positive integer");
 				return;
 			}
 			$sql = "
@@ -166,7 +166,7 @@ class CMS_profile_user extends CMS_profile
 			if ($q->getNumRows()) {
 				$data = $q->getArray();
 			} else {
-				$this->raiseError("Unknown DB ID : ".$id);
+				$this->setError("Unknown DB ID : ".$id);
 				$this->_language = new CMS_language();
 				$this->_contactData = CMS_contactDatas_catalog::getByUser(array());
 				// Initialize super class
@@ -276,7 +276,7 @@ class CMS_profile_user extends CMS_profile
 	  */
 	function setFavorite($status, $pageId) {
 		if (!sensitiveIO::isPositiveInteger($pageId)) {
-			$this->raiseError("Page Id must be an integer : ".$pageId);
+			$this->setError("Page Id must be an integer : ".$pageId);
 			return false;
 		}
 		if (in_array($pageId, $this->_favorites)) {
@@ -319,7 +319,7 @@ class CMS_profile_user extends CMS_profile
       * @return boolean true on success, false on failure
       * @access public
       */
-    function checkLogin($login){
+    public static function checkLogin($login){
         return io::isValidLogin( $login ); 
     }
 	
@@ -333,12 +333,12 @@ class CMS_profile_user extends CMS_profile
     function setLogin($login)
     {
         if (!CMS_profile_user::checkLogin($login)) {
-            $this->raiseError('Login is invalid. A login must use only alphanumerics caracters');
+            $this->setError('Login is invalid. A login must use only alphanumerics caracters');
             return false;
         }
         // Check if login allready exists
         if (CMS_profile_usersCatalog::loginExists($login, $this)){
-            $this->raiseError('Login allready exists. Choose another one');
+            $this->setError('Login allready exists. Choose another one');
             return false;
         }
         $this->_login = $login;
@@ -356,7 +356,7 @@ class CMS_profile_user extends CMS_profile
 	function setPassword($password, $encode = true) {
 		// Check password validity
 	    if ($encode && !SensitiveIO::isValidPassword($password)) {
-			$this->raiseError('Invalid password. Length must be > '.MINIMUM_PASSWORD_LENGTH);
+			$this->setError('Invalid password. Length must be > '.MINIMUM_PASSWORD_LENGTH);
 			return false;
 		}
 		$this->_password = $encode ? '{sha}'.sha1($password) : $password;
@@ -471,7 +471,7 @@ class CMS_profile_user extends CMS_profile
 			$this->_contactData = $contactData;
 			return true;
 		} else {
-			$this->raiseError("Try to set an invalid Contact data object or object has an error: ".print_r($contactData, true));
+			$this->setError("Try to set an invalid Contact data object or object has an error: ".print_r($contactData, true));
 		}
 		return false;
 	}
@@ -531,7 +531,7 @@ class CMS_profile_user extends CMS_profile
 		        return true;
 		    }
 		}
-		$this->raiseError("Object required, or available language code : ".$language);
+		$this->setError("Object required, or available language code : ".$language);
 		return false;
 	}
 	
@@ -553,7 +553,7 @@ class CMS_profile_user extends CMS_profile
 			}
 			return true;
 		} else {
-			$this->raiseError("Invalid module name :".$moduleName);
+			$this->setError("Invalid module name :".$moduleName);
 		}
 		return false;
 	}
@@ -610,7 +610,7 @@ class CMS_profile_user extends CMS_profile
 			$this->_validationChange = true;
 			return true;
 		} else {
-			$this->raiseError("Validation object required");
+			$this->setError("Validation object required");
 		}
 		return false;
 	}
@@ -646,7 +646,7 @@ class CMS_profile_user extends CMS_profile
 				} else if (method_exists($this->_contactData, $method)) {
 					return $this->_contactData->{$method}();
 				} else {
-					$this->raiseError('Unknown property to get : "'.$property.'"');
+					$this->setError('Unknown property to get : "'.$property.'"');
 				}
 			break;
 		}
@@ -668,7 +668,7 @@ class CMS_profile_user extends CMS_profile
 				if (method_exists($this, $method)) {
 					return $this->{$method}($value);
 				} else {
-					$this->raiseError('Unknown property to set : "'.$property.'"');
+					$this->setError('Unknown property to set : "'.$property.'"');
 				}
 			break;
 		}
