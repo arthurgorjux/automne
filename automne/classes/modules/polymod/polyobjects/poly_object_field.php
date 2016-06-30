@@ -9,7 +9,7 @@
 // | LICENSE-GPL, and is available through the world-wide-web at		  |
 // | http://www.gnu.org/copyleft/gpl.html.								  |
 // +----------------------------------------------------------------------+
-// | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
+// | Author: SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
 // $Id: poly_object_field.php,v 1.3 2010/03/08 16:43:33 sebastien Exp $
@@ -21,7 +21,7 @@
   *
   * @package Automne
   * @subpackage polymod
-  * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
+  * @author SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
 class CMS_poly_object_field extends CMS_poly_object_definition
@@ -169,7 +169,7 @@ class CMS_poly_object_field extends CMS_poly_object_definition
 	  * @access public
 	  */
 	function getValue($valueName) {
-		if (!isset($this->_objectFieldValues[$valueName])) {
+		if (!array_key_exists($valueName,$this->_objectFieldValues )) {
 			$this->setError("Unknown valueName to get : ".$valueName);
 			return false;
 		}
