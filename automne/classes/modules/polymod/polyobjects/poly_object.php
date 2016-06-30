@@ -9,7 +9,7 @@
 // | LICENSE-GPL, and is available through the world-wide-web at		  |
 // | http://www.gnu.org/copyleft/gpl.html.								  |
 // +----------------------------------------------------------------------+
-// | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
+// | Author: SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 
 /**
@@ -19,7 +19,7 @@
   *
   * @package Automne
   * @subpackage polymod
-  * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
+  * @author SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
 class CMS_poly_object extends CMS_resource
@@ -1581,7 +1581,8 @@ class CMS_poly_object extends CMS_resource
 				//Log action
 				$log = new CMS_log();
 				$language = $cms_user->getLanguage();
-				$log->logResourceAction(CMS_log::LOG_ACTION_RESOURCE_DELETE, $cms_user, $polyModuleCodename, $this->getStatus(), 'Item \''.$this->getLabel().'\' ('.$objectDef->getLabel($language).')', $this);
+				$status = $this->getStatus();
+				$log->logResourceAction(CMS_log::LOG_ACTION_RESOURCE_DELETE, $cms_user, $polyModuleCodename, $status, 'Item \''.$this->getLabel().'\' ('.$objectDef->getLabel($language).')', $this);
 
 				//Clear polymod cache
 				//CMS_cache::clearTypeCacheByMetas('polymod', array('module' => $polyModuleCodename));
