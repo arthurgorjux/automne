@@ -9,7 +9,7 @@
 // | LICENSE-GPL, and is available through the world-wide-web at		  |
 // | http://www.gnu.org/copyleft/gpl.html.								  |
 // +----------------------------------------------------------------------+
-// | Author: Sebastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
+// | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
 // $Id: poly_definition_parsing.php,v 1.18 2010/03/08 16:43:30 sebastien Exp $
@@ -21,7 +21,7 @@
   *
   * @package Automne
   * @subpackage polymod
-  * @author S�bastien Pauchet <sebastien.pauchet@ws-interactive.fr>
+  * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
 class CMS_polymod_definition_parsing extends CMS_grandFather
@@ -902,7 +902,7 @@ class CMS_polymod_definition_parsing extends CMS_grandFather
 			$objects = CMS_polymod_definition_parsing::preReplaceVars($tag['attributes']["object"], false, true, false, true);
 			if (is_array($objects) && $objects) {
 				$return .='
-				$object_'.$uniqueID.' = &'.array_pop($objects).';
+				$object_'.$uniqueID.' = '.array_pop($objects).';
 				if (method_exists($object_'.$uniqueID.', "'.$tag['attributes']["function"].'")) {
 					$content .= CMS_polymod_definition_parsing::replaceVars($object_'.$uniqueID.'->'.$tag['attributes']["function"].'($parameters_'.$uniqueID.', '.CMS_polymod_definition_parsing::preReplaceVars(var_export($childrens ,true), true).'), $replace);
 				} else {
