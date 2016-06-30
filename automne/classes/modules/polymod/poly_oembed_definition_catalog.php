@@ -13,7 +13,8 @@ class CMS_polymod_oembed_definition_catalog extends CMS_grandFather
 		}
 		$sql = 'SELECT * from mod_object_oembed_definition where id_mood = '.io::sanitizeSQLString($id);
 		$query = new CMS_query($sql);
-		$data = array_pop($query->getAll());
+		$queryAll = $query->getAll();
+		$data = array_pop($queryAll);
 		if($data === null) {
 			return null;
 		}
@@ -65,7 +66,8 @@ class CMS_polymod_oembed_definition_catalog extends CMS_grandFather
 			$sql .= ' AND id_mood <> '.$id;
 		}
 		$query = new CMS_query($sql);
-		$data = array_pop($query->getAll());
+		$queryAll = $query->getAll();
+		$data = array_pop($queryAll);
 		return (int) $data['count'];
 	}
 }
