@@ -10,8 +10,8 @@
 // | http://www.gnu.org/copyleft/gpl.html.								  |
 // +----------------------------------------------------------------------+
 // | Author: Antoine Pouch <antoine.pouch@ws-interactive.fr> &            |
-// | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr> &    |
-// | Author: Cédric Soret <cedric.soret@ws-interactive.fr>                |
+// | Author: SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr> &    |
+// | Author: CÃ©dric Soret <cedric.soret@ws-interactive.fr>                |
 // +----------------------------------------------------------------------+
 //
 // $Id: module.php,v 1.9 2010/03/08 16:43:30 sebastien Exp $
@@ -25,8 +25,8 @@
   * @package Automne
   * @subpackage modules
   * @author Antoine Pouch <antoine.pouch@ws-interactive.fr> &
-  * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr> &
-  * @author Cédric Soret <cedric.soret@ws-interactive.fr>
+  * @author SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr> &
+  * @author CÃ©dric Soret <cedric.soret@ws-interactive.fr>
   */
 
 class CMS_module extends CMS_grandFather
@@ -629,17 +629,14 @@ class CMS_module extends CMS_grandFather
 	  */
 	public static function getModuleCategories($attrs)
 	{
-		if ((!isset($attrs["module"]) || !$attrs["module"]) && $this->_codename) {
-			$attrs["module"] = $this->_codename;
-		}
-		if (!$attrs["module"]) {
+		if (!array_key_exists('module', $attrs) || !$attrs["module"]) {
 			CMS_grandFather::raiseError("No codename defined to get its categories");
-			return false;
+			return array();
 		}
 		if (APPLICATION_ENFORCES_ACCESS_CONTROL != false
 				&& !($attrs["cms_user"] instanceof CMS_profile)) {
 			CMS_grandFather::raiseError("Not valid CMS_profile given as enforced access control is active");
-			return false;
+			return array();
 		}
 		if (isset($attrs["cms_user"]) && ($attrs["cms_user"] instanceof CMS_profile)
 				&& $attrs["cms_user"]->hasAdminClearance(CLEARANCE_ADMINISTRATION_EDITVALIDATEALL)) {

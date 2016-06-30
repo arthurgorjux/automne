@@ -32,6 +32,7 @@ automne/ase/*
 *.tgz
 *.tar.gz
 *.zip
+.idea
 # Demo files
 automne/templates/pt*.xml
 automne/templates/rows/r*.xml
