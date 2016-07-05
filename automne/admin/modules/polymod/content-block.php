@@ -98,8 +98,6 @@ if (!$cs
 }
 //instanciate block
 $cms_block = new CMS_block_polymod();
-CMS_grandFather::log("blockId : " + $blockId);
-CMS_grandFather::log("rowId" + $rowId);
 $cms_block->initializeFromID($blockId, $rowId);
 //instanciate block module
 $cms_module = CMS_modulesCatalog::getByCodename($codename);

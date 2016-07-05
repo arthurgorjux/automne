@@ -87,7 +87,6 @@ $jscontent = '';
 @ignore_user_abort(true);
 @set_time_limit(9000);
 
-CMS_grandFather::log($action);
 switch ($action) {
 	case 'validateById':
 		$validationIds = array();
@@ -130,7 +129,6 @@ switch ($action) {
 			}
 			//ask the module to process the validation
 			$mod = CMS_modulesCatalog::getByCodename($validation->getModuleCodename());
-			CMS_grandFather::log($mod);
 			if (is_a($mod, "CMS_module")) {
 				$res = $validation->getResource();
 				if ($mod->processValidation($validation, $acceptStatus)) {

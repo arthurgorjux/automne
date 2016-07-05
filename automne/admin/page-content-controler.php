@@ -294,7 +294,6 @@ switch ($action) {
 					$modulesTreatment->setDefinition($datas);
 					$datas = $modulesTreatment->treatContent(true);
 				}
-				//CMS_grandFather::log($datas);
 				//set datas as returned content
 				$view->setContent($datas);
 				$edited = true;
