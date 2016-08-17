@@ -602,27 +602,45 @@ class SensitiveIO extends CMS_grandFather
 	  * @access public
 	  */
 	static function convertTextToHTML($body, $withNl2Br = true) {
-		$HTMLBody = preg_replace(
-				array(
-					'/(?(?=<a[^>]*>.+<\/a>)
-					(?:<a[^>]*>.+<\/a>)
-					|
-					([^="\']?)((?:https?|ftp|bf2|):\/\/[^<> \n\r]+)
-					)/iex',
-					'/<a([^>]*)target="?[^"\']+"?/i',
-					'/<a([^>]+)>/i',
-					'/(^|\s)(www.[^<> \n\r]+)/iex',
-					'/(([_A-Za-z0-9-]+)(\\.[_A-Za-z0-9-]+)*@([A-Za-z0-9-]+)
-					(\\.[A-Za-z0-9-]+)*)/iex'
-				),
-				array(
-					"stripslashes((strlen('\\2')>0?'\\1<a href=\"\\2\" target=\"_blank\">\\2</a>\\3':'\\0'))",
-					'<a\\1',
-					'<a\\1 target="_blank">',
-					"stripslashes((strlen('\\2')>0?'\\1<a href=\"http://\\2\" target=\"_blank\">\\2</a>\\3':'\\0'))",
-					"stripslashes((strlen('\\2')>0?'<a href=\"mailto:\\0\">\\0</a>':'\\0'))"
-				),$body);
-		return $withNl2Br ? nl2br($HTMLBody) : $HTMLBody;
+		$body = preg_replace_callback(
+			'/(?(?=<a[^>]*>.+<\/a>)(?:<a[^>]*>.+<\/a>)|([^="\']?)((?:https?|ftp|bf2|):\/\/[^<> \n\r]+))/ix',
+			function($matches) {
+				// "stripslashes((strlen('\\2')>0?'\\1<a href=\"\\2\" target=\"_blank\">\\2</a>\\3':'\\0'))",
+				return stripslashes((io::strlen($matches[2]) > 0 ? $matches[1] . '<a href=\"' . $matches[2] . '\">' . $matches[2] . '</a>' : $matches[0] ));
+			},
+			$body
+		);
+		// remove target
+		$body = preg_replace_callback(
+			'/<a([^>]*)target="?[^"\']+"?/i',
+			function($matches) {
+				return '<a' . $matches[1];
+			},
+			$body
+		);
+		// add _blank target
+		$body = preg_replace_callback(
+			'/<a([^>]+)>/i',
+			function($matches) {
+				return '<a' . $matches[1] . ' target="_blank">';
+			},
+			$body
+		);
+		$body = preg_replace_callback(
+			'/(^|\s)(www.[^<> \n\r]+)/ix',
+			function($matches) {
+				return stripslashes((io::strlen($matches[2]) > 0 ? $matches[1] . '<a href=\"http://' . $matches[2] . '\">' . $matches[2] . '</a>' : $matches[0] ));
+			},
+			$body
+		);
+		$body = preg_replace_callback(
+				'/(([_A-Za-z0-9-]+)(\\.[_A-Za-z0-9-]+)*@([A-Za-z0-9-]+)(\\.[A-Za-z0-9-]+)*)/ix',
+			function($matches) {
+				return stripslashes((io::strlen($matches[2]) > 0 ? '<a href=\"mailto:' . $matches[0] . '\">' . $matches[0] . '</a>' : $matches[0] ));
+			},
+			$body
+		);
+		return $withNl2Br ? nl2br($body) : $body;
 	}
 	
 	/**

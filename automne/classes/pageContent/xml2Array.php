@@ -9,7 +9,7 @@
 // | LICENSE-GPL, and is available through the world-wide-web at		  |
 // | http://www.gnu.org/copyleft/gpl.html.								  |
 // +----------------------------------------------------------------------+
-// | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
+// | Author: SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
 // $Id: xml2Array.php,v 1.6 2010/03/08 16:43:33 sebastien Exp $
@@ -21,7 +21,7 @@
   *
   * @package Automne
   * @subpackage pageContent
-  * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
+  * @author SÃ©bastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
 class CMS_xml2Array extends CMS_grandFather
@@ -62,7 +62,7 @@ class CMS_xml2Array extends CMS_grandFather
 				xml_set_default_handler($parser, "_tagData" );
 				//enclose with html tag
 				if ($this->_params & self::XML_ENCLOSE) {
-					$xml = '<html>'.$xml.'</html>';
+					@$xml = '<html>'.$xml.'</html>';
 				}
 				//add encoding declaration
 				if ($this->_params ^ self::XML_DONT_ADD_XMLDECL) {
